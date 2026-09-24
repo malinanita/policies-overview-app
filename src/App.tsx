@@ -1,15 +1,16 @@
 import './App.css'
 import { useEffect, useState } from 'react'
 import type { Policy } from './types/policy.ts'
+import PolicyCard from './components/PolicyCard.tsx'
+
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 function App() {
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error,setError] = useState<string | null>(null);
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    //Hämta policies
     const fetchPolicies = async () => {
       try {
         const response = await fetch(`${apiBaseUrl}/policies/List`);
@@ -19,17 +20,16 @@ function App() {
         }
 
         const policiesData: Policy[] = await response.json();
-        //console.log(policiesData);
         setPolicies(policiesData);
       } catch {
-        setError('Något gick fel vid hämtning av policies');
+        setError('Något gick fel vid hämtning av försäkringar');
       } finally {
         setIsLoading(false);
       }
 
     }
     fetchPolicies();
-  },[]);
+  }, []);
 
   if (isLoading) {
     return <p>Laddar...</p>;
@@ -49,7 +49,7 @@ function App() {
       <ul> 
         {policies.map((policy) => (
           <li key={policy.policyNumber}>
-            {policy.productName}
+            <PolicyCard policy={policy} />
           </li>
         ))}
       </ul>
