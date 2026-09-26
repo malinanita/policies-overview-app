@@ -2,12 +2,9 @@ import './App.css'
 import { useEffect, useState } from 'react'
 import type { Policy, PolicyStatus } from './types/policy.ts'
 import PolicyCard from './components/PolicyCard.tsx'
+import FilterPanel from './components/FilterPanel.tsx'
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-const statusOptions: { value: PolicyStatus; label: string }[] = [
-  { value: "Active", label: "Aktiva försäkringar" },
-  { value: "Inactive", label: "Avslutade försäkringar" },
-];
 
 function App() {
   const [policies, setPolicies] = useState<Policy[]>([]);
@@ -40,7 +37,7 @@ function App() {
   const handleApplyFilters = () => {
     setAppliedProducts(selectedProducts);
     setAppliedStatuses(selectedStatuses);
-  }
+  };
 
   const productNames = [
     ...new Set(policies.map((policy) => policy.productName))
@@ -48,8 +45,8 @@ function App() {
 
   const filteredPolicies = policies.filter((policy) => {
     const matchesProduct =
-    appliedProducts.length === 0 ||
-    appliedProducts.includes(policy.productName);
+      appliedProducts.length === 0 ||
+      appliedProducts.includes(policy.productName);
 
     const matchesStatus =
       appliedStatuses.length === 0 ||
@@ -95,36 +92,15 @@ function App() {
     <>
       <h1>Mina försäkringar</h1>
 
-      <fieldset>
-        <legend>Typ av försäkring</legend>
-        {productNames.map((product) => (
-          <label key={product}>
-            <input
-              type="checkbox"
-              checked={selectedProducts.includes(product)}
-              onChange={() => handleProductChange(product)}
-            />
-            {product}
-          </label>
-        ))}
-      </fieldset>
+      <FilterPanel
+        productNames={productNames}
+        selectedProducts={selectedProducts}
+        selectedStatuses={selectedStatuses}
+        onProductChange={handleProductChange}
+        onStatusChange={handleStatusChange}
+        onApplyFilters={handleApplyFilters}
+      />
 
-      <fieldset>
-        <legend>Status</legend>
-        {statusOptions.map((option) => (
-          <label key={option.value}>
-            <input
-              type="checkbox"
-              checked={selectedStatuses.includes(option.value)}
-              onChange={() => handleStatusChange(option.value)}
-            />
-            {option.label}
-          </label>
-        ))}
-      </fieldset>
-
-      <button onClick={handleApplyFilters}>Visa försäkringar</button>
-      
       {filteredPolicies.length === 0 ? (
         <p>Inga försäkringar matchar dina filter.</p>
       ) : (
