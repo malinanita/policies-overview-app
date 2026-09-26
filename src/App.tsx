@@ -22,21 +22,19 @@ function App() {
   const [appliedStatuses, setAppliedStatuses] = useState<PolicyStatus[]>([]);
 
   const handleProductChange = (product: string) => {
-    if (selectedProducts.includes(product)){
-      setSelectedProducts(selectedProducts.filter((p) => p !== product));
-    } else {
-      setSelectedProducts([...selectedProducts, product]);
-    }
-  }
+    setSelectedProducts((prev) =>
+      prev.includes(product)
+      ? prev.filter((p) => p !== product)
+      : [...prev, product]
+    );
+  };
 
   const handleStatusChange = (status: PolicyStatus) => {
-    if (selectedStatuses.includes(status)) {
-      setSelectedStatuses(
-        selectedStatuses.filter((s) => s !== status)
+    setSelectedStatuses((prev) => 
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status]
       );
-    } else {
-      setSelectedStatuses([...selectedStatuses, status]);
-    }
   };
 
   const handleApplyFilters = () => {
@@ -46,7 +44,7 @@ function App() {
 
   const productNames = [
     ...new Set(policies.map((policy) => policy.productName))
-  ];
+  ].sort((a, b) => a.localeCompare(b, 'sv'));
 
   const filteredPolicies = policies.filter((policy) => {
     const matchesProduct =
@@ -97,37 +95,47 @@ function App() {
     <>
       <h1>Mina försäkringar</h1>
 
-    {productNames.map((product) => (
-      <label key={product}>
-        <input
-          type="checkbox"
-          checked={selectedProducts.includes(product)}
-          onChange={() => handleProductChange(product)}
-        />
-        {product}
-      </label>
-    ))}
+      <fieldset>
+        <legend>Typ av försäkring</legend>
+        {productNames.map((product) => (
+          <label key={product}>
+            <input
+              type="checkbox"
+              checked={selectedProducts.includes(product)}
+              onChange={() => handleProductChange(product)}
+            />
+            {product}
+          </label>
+        ))}
+      </fieldset>
 
-    {statusOptions.map((option) => (
-      <label key={option.value}>
-        <input
-          type="checkbox"
-          checked={selectedStatuses.includes(option.value)}
-          onChange={() => handleStatusChange(option.value)}
-        />
-        {option.label}
-      </label>
-    ))}
+      <fieldset>
+        <legend>Status</legend>
+        {statusOptions.map((option) => (
+          <label key={option.value}>
+            <input
+              type="checkbox"
+              checked={selectedStatuses.includes(option.value)}
+              onChange={() => handleStatusChange(option.value)}
+            />
+            {option.label}
+          </label>
+        ))}
+      </fieldset>
 
       <button onClick={handleApplyFilters}>Visa försäkringar</button>
       
-      <ul> 
-        {filteredPolicies.map((policy) => (
-          <li key={policy.policyNumber}>
-            <PolicyCard policy={policy} />
-          </li>
-        ))}
-      </ul>
+      {filteredPolicies.length === 0 ? (
+        <p>Inga försäkringar matchar dina filter.</p>
+      ) : (
+        <ul> 
+          {filteredPolicies.map((policy) => (
+            <li key={policy.policyNumber}>
+              <PolicyCard policy={policy} />
+            </li>
+          ))}
+        </ul>
+      )}
     </>
   )
 }
