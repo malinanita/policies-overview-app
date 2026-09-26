@@ -1,4 +1,4 @@
-import './App.css'
+import styles from './App.module.css'
 import { useEffect, useState } from 'react'
 import type { Policy, PolicyStatus } from './types/policy.ts'
 import PolicyCard from './components/PolicyCard.tsx'
@@ -77,52 +77,59 @@ function App() {
   }, []);
 
   if (isLoading) {
-    return <p>Laddar...</p>;
+    return <p className={styles.message} role="status">Laddar...</p>;
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <p className={styles.message} role="alert">{error}</p>;
   }
 
   if (policies.length === 0) {
-    return <p>Inga försäkringar hittades.</p>;
+    return <p className={styles.message}>Inga försäkringar hittades.</p>;
   }
 
   return (
-    <>
-      <h1>Mina försäkringar</h1>
+    <main className={styles.page}>
+      <h1 className={styles.title}>Mina Försäkringar</h1>
 
-      <button
-        type="button"
-        onClick={() => setIsFilterOpen(true)}
-      >
-        Filtrera
-      </button>
+      <div className={styles.layout}>
+        <div className={styles.toolbar}>
+          <button
+            type="button"
+            className={styles.filterButton}
+            aria-expanded={isFilterOpen}
+            aria-controls="filter-panel"
+            onClick={() => setIsFilterOpen(true)}
+          >
+            Filtrera
+          </button>
+        </div>
 
-      {isFilterOpen && (
-        <FilterPanel
-          productNames={productNames}
-          selectedProducts={selectedProducts}
-          selectedStatuses={selectedStatuses}
-          onProductChange={handleProductChange}
-          onStatusChange={handleStatusChange}
-          onApplyFilters={handleApplyFilters}
-          onClose={() => setIsFilterOpen(false)}
-        />
-      )}
+        {isFilterOpen && (
+          <FilterPanel
+            productNames={productNames}
+            selectedProducts={selectedProducts}
+            selectedStatuses={selectedStatuses}
+            onProductChange={handleProductChange}
+            onStatusChange={handleStatusChange}
+            onApplyFilters={handleApplyFilters}
+            onClose={() => setIsFilterOpen(false)}
+          />
+        )}
 
-      {filteredPolicies.length === 0 ? (
-        <p>Inga försäkringar matchar dina filter.</p>
-      ) : (
-        <ul> 
-          {filteredPolicies.map((policy) => (
-            <li key={policy.policyNumber}>
-              <PolicyCard policy={policy} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </>
+        {filteredPolicies.length === 0 ? (
+          <p className={styles.emptyFilter}>Inga försäkringar matchar dina filter.</p>
+        ) : (
+          <ul className={styles.list}>
+            {filteredPolicies.map((policy) => (
+              <li key={policy.policyNumber}>
+                <PolicyCard policy={policy} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </main>
   )
 }
 

@@ -1,4 +1,5 @@
 import type { PolicyStatus } from '../types/policy';
+import styles from './FilterPanel.module.css'
 
 type FilterPanelProps = {
   productNames: string[];
@@ -25,17 +26,23 @@ export default function FilterPanel({
   onClose,
 }: FilterPanelProps) {
   return (
-    <div>
-      <button type="button" onClick={onClose} aria-label="Stäng filter">
+    <aside id="filter-panel" className={styles.panel} aria-label="Filter">
+      <button
+        type="button"
+        className={styles.closeButton}
+        onClick={onClose}
+        aria-label="Stäng filter"
+      >
         ×
       </button>
 
-      <fieldset>
-        <legend>Typ av försäkring</legend>
+      <fieldset className={styles.fieldset}>
+        <legend className={styles.legend}>Typ av försäkring</legend>
         {productNames.map((product) => (
-          <label key={product}>
+          <label key={product} className={styles.option}>
             <input
               type="checkbox"
+              className={styles.checkbox}
               checked={selectedProducts.includes(product)}
               onChange={() => onProductChange(product)}
             />
@@ -44,12 +51,13 @@ export default function FilterPanel({
         ))}
       </fieldset>
 
-      <fieldset>
-        <legend>Status</legend>
+      <fieldset className={styles.fieldset}>
+        <legend className={styles.legend}>Status</legend>
         {statusOptions.map((option) => (
-          <label key={option.value}>
+          <label key={option.value} className={styles.option}>
             <input
               type="checkbox"
+              className={styles.checkbox}
               checked={selectedStatuses.includes(option.value)}
               onChange={() => onStatusChange(option.value)}
             />
@@ -58,9 +66,9 @@ export default function FilterPanel({
         ))}
       </fieldset>
 
-      <button type="button" onClick={onApplyFilters}>
+      <button type="button" className={styles.applyButton} onClick={onApplyFilters}>
         Visa försäkringar
       </button>
-    </div>
+    </aside>
   );
 }
