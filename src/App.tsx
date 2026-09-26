@@ -10,6 +10,7 @@ function App() {
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Keep selected and applied filters separate so filtering only occurs
   // when the user clicks "Visa försäkringar".
@@ -71,7 +72,6 @@ function App() {
       } finally {
         setIsLoading(false);
       }
-
     }
     fetchPolicies();
   }, []);
@@ -92,14 +92,24 @@ function App() {
     <>
       <h1>Mina försäkringar</h1>
 
-      <FilterPanel
-        productNames={productNames}
-        selectedProducts={selectedProducts}
-        selectedStatuses={selectedStatuses}
-        onProductChange={handleProductChange}
-        onStatusChange={handleStatusChange}
-        onApplyFilters={handleApplyFilters}
-      />
+      <button
+        type="button"
+        onClick={() => setIsFilterOpen(true)}
+      >
+        Filtrera
+      </button>
+
+      {isFilterOpen && (
+        <FilterPanel
+          productNames={productNames}
+          selectedProducts={selectedProducts}
+          selectedStatuses={selectedStatuses}
+          onProductChange={handleProductChange}
+          onStatusChange={handleStatusChange}
+          onApplyFilters={handleApplyFilters}
+          onClose={() => setIsFilterOpen(false)}
+        />
+      )}
 
       {filteredPolicies.length === 0 ? (
         <p>Inga försäkringar matchar dina filter.</p>

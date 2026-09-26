@@ -7,6 +7,7 @@ type FilterPanelProps = {
   onProductChange: (product: string) => void;
   onStatusChange: (status: PolicyStatus) => void;
   onApplyFilters: () => void;
+  onClose: () => void;
 };
 
 const statusOptions: { value: PolicyStatus; label: string }[] = [
@@ -21,9 +22,14 @@ export default function FilterPanel({
   onProductChange,
   onStatusChange,
   onApplyFilters,
+  onClose,
 }: FilterPanelProps) {
   return (
     <div>
+      <button type="button" onClick={onClose} aria-label="Stäng filter">
+        ×
+      </button>
+
       <fieldset>
         <legend>Typ av försäkring</legend>
         {productNames.map((product) => (
