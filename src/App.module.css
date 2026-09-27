@@ -13,6 +13,8 @@
 .layout {
   display: grid;
   grid-template-columns: 1fr minmax(0, 920px) 1fr;
+  /* Prevent the filter panel from increasing the toolbar row height */  
+  grid-template-rows: auto 1fr;
   grid-template-areas:
     ". toolbar filter"
     ". list    filter";
@@ -93,6 +95,7 @@
   /* Small screens: the panel sits in the page between the filter button and the list */
   .layout {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
     grid-template-areas:
       "toolbar"
       "filter"
