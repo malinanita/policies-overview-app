@@ -3,13 +3,16 @@ import { useEffect, useState } from 'react'
 import type { Policy, PolicyStatus } from './types/policy.ts'
 import PolicyCard from './components/PolicyCard.tsx'
 import FilterPanel from './components/FilterPanel.tsx'
+import Pagination from './components/Pagination.tsx'
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const policiesPerPage = 5;
 
 function App() {
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Keep selected and applied filters separate so filtering only occurs
@@ -18,6 +21,8 @@ function App() {
   const [appliedProducts, setAppliedProducts] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<PolicyStatus[]>([]);
   const [appliedStatuses, setAppliedStatuses] = useState<PolicyStatus[]>([]);
+  
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleProductChange = (product: string) => {
     setSelectedProducts((prev) =>
@@ -38,6 +43,7 @@ function App() {
   const handleApplyFilters = () => {
     setAppliedProducts(selectedProducts);
     setAppliedStatuses(selectedStatuses);
+    setCurrentPage(1);
   };
 
   const productNames = [
@@ -55,6 +61,13 @@ function App() {
 
     return matchesProduct && matchesStatus;
   });
+
+  const totalPages = Math.ceil(filteredPolicies.length / policiesPerPage);
+  const pageStartIndex = (currentPage - 1) * policiesPerPage;
+  const paginatedPolicies = filteredPolicies.slice(
+    pageStartIndex,
+    pageStartIndex + policiesPerPage
+  );
 
   useEffect(() => {
     const fetchPolicies = async () => {
@@ -93,7 +106,24 @@ function App() {
       <h1 className={styles.title}>Mina Försäkringar</h1>
 
       <div className={styles.layout}>
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        )}
+
         <div className={styles.toolbar}>
+          {filteredPolicies.length > 0 && (
+            <p className={styles.resultCount} role="status">
+              Visar {pageStartIndex + 1}-{pageStartIndex + paginatedPolicies.length} av{' '}
+              {filteredPolicies.length} försäkringar
+            </p>
+          )}
+
           <button
             type="button"
             className={styles.filterButton}
@@ -121,7 +151,7 @@ function App() {
           <p className={styles.emptyFilter}>Inga försäkringar matchar dina filter.</p>
         ) : (
           <ul className={styles.list}>
-            {filteredPolicies.map((policy) => (
+            {paginatedPolicies.map((policy) => (
               <li key={policy.policyNumber}>
                 <PolicyCard policy={policy} />
               </li>
